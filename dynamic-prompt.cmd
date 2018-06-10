@@ -20,7 +20,7 @@ if "%1"=="/?" goto :PrintUsage
 
 REM /init <command> <command_to_call>
 if "%1"=="/init" call :Initialize %2 %3
-if "%1"=="/exec" call :ExecuteGitCommand %ALL_BUT_FIRST%
+if "%1"=="/exec" call :ExecuteOrigCommand %ALL_BUT_FIRST%
 
 REM Set prompt and finish execution
 goto :SetPrompt
@@ -42,8 +42,8 @@ REM Initialize
     echo Dynamic prompt initialized
 goto :EOF
 
-REM Execute git command
-:ExecuteGitCommand
+REM Execute original command
+:ExecuteOrigCommand
     if "%1"=="" (
         echo Missing command parameter: %*
         call :PrintUsage
@@ -60,11 +60,6 @@ goto :EOF
 REM SetPrompt
 :SetPrompt
     if "%debug%"=="1" echo [Debug] SetPrompt
-    set GITBRANCH=
-    for /f %%i in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%i
-
-
-    if "%debug%"=="1" echo [Debug] Git branch: %GITBRANCH%
 
     if not exist %template% (
         echo Prompt template file does not exist: %template%
