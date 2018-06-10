@@ -4,7 +4,6 @@ set DYNAMICPROMPTSCRIPT=%~dp0dynamic-prompt.cmd
 set GITBRANCH=
 for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
 
-setlocal enableextensions enabledelayedexpansion
 
 if "%1"=="/init" goto :Initialize
 
@@ -22,7 +21,6 @@ goto :setprompt
 :Initialize
   endlocal
   REM Initialize dynamic prompt to trigger on "git" command and trigger this wrapper
-  echo Call: %DYNAMICPROMPTSCRIPT% /init git %~dpn0
   call %DYNAMICPROMPTSCRIPT% /init git %~dpn0
 goto :setprompt
 
@@ -32,7 +30,7 @@ goto :setprompt
     ::check if second param is for deleting branch
     if "%2" EQU "-d" set res=T
     if "%2" EQU "-D" set res=T
-    if "!res!"=="T" (
+    if "%res%"=="T" (
       if "%3" EQU "" (
         call :listbranches "Select branch to delete:" "Deleting branch" "git branch %2"
         goto :eof
@@ -59,7 +57,7 @@ if "%2" NEQ "" (
           echo     N - Create new branch based on master
           set /p answer=Was that your intention?
 
-          if /I "!answer!" NEQ "y" (
+          if /I "%answer%" NEQ "y" (
             echo Executing: git checkout %2 %3 master
             git checkout %2 %3 master
             goto :setprompt
@@ -75,7 +73,6 @@ call :listbranches "Select branch to checkout:" "Switching to branch" "git check
 
 
 :setprompt
-endlocal
 
 set GITBRANCH=
 for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
@@ -83,6 +80,9 @@ for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%
 exit /B %ERRORLEVEL%
 
 :listbranches
+
+  setlocal enableextensions enabledelayedexpansion
+
   set info=%1
   set confirmation=%2
   set command=%3
@@ -119,9 +119,12 @@ exit /B %ERRORLEVEL%
 
         ::execute command with branch param
         call %command:"=% !vector[%%n]!
+        endlocal
         goto :setprompt
       )
     )
   )
+
+  endlocal
 goto :EOF
 
