@@ -6,6 +6,7 @@ for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%
 
 
 if "%1"=="/init" goto :Initialize
+if "%1"=="/cd" goto :ChangeDirectory
 
 if "%1"=="branch" goto :branch
 if "%1"=="checkout" goto :checkout
@@ -22,6 +23,8 @@ goto :setprompt
   endlocal
   REM Initialize dynamic prompt to trigger on "git" command and trigger this wrapper
   call %DYNAMICPROMPTSCRIPT% /init git %~dpn0
+  REM Update prompt when user changes directory using CD command
+  call %DYNAMICPROMPTSCRIPT% /init cd %~dpn0 /cd
 goto :setprompt
 
 :branch
@@ -77,7 +80,15 @@ call :listbranches "Select branch to checkout:" "Switching to branch" "git check
 set GITBRANCH=
 for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
 
+set SET_DEFAULT_PROMPT=0
+if "%GITBRANCH%"=="" set SET_DEFAULT_PROMPT=1
+
 exit /B %ERRORLEVEL%
+
+:ChangeDirectory
+  for /f "tokens=1,* delims= " %%a in ("%*") do set ALL_BUT_FIRST=%%b
+  cd %ALL_BUT_FIRST%
+goto :setprompt
 
 :listbranches
 
