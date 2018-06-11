@@ -3,7 +3,7 @@
 set script=%~dpn0
 set template=%~dp0template.txt
 set temp_file=%TEMP%\prompt.txt
-set debug=1
+set debug=0
 
 
 if "%debug%"=="1" echo [Debug] First param: %1
