@@ -4,12 +4,12 @@ Windows command line prompt for Git.
 ![Command prompt example](img/screenshot.png)
 
 
-1. [Problem](#Problem)
-2. [Solution](#Solution)
-3. [Installation](#Installation)
-4. [Modules](#Modules)
-    * [Dynamic prompt](#1.%20Dynamic%20prompt)
-    * [Git wrapper](#2.%20Git%20wrapper)
+1. [Problem](#problem)
+2. [Solution](#solution)
+3. [Installation](#installation)
+4. [Modules](#modules)
+    * [Dynamic prompt](#1-dynamic-prompt)
+    * [Git wrapper](#2-git-wrapper)
 
 ---
 
