@@ -41,7 +41,7 @@ REM Initialize
     if "%debug%"=="1" echo [Debug] Initialize: %1=%command%
     REM overriding original command
     doskey %1=%command%
-    echo Dynamic prompt initialized
+    echo Dynamic prompt initialized for "%~1" command
 goto :EOF
 
 REM Execute original command
