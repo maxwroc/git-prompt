@@ -1,5 +1,7 @@
 @echo off
 
+set debug=0
+
 set DYNAMICPROMPTSCRIPT=%~dp0dynamic-prompt.cmd
 set GITBRANCH=
 for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
@@ -13,7 +15,7 @@ if "%1"=="/cd" goto :ChangeDirectory
 if "%1"=="branch" goto :branch
 if "%1"=="checkout" goto :checkout
 
-
+::if there was no supported param just execute git cmd
 :executecommand
 
 git %*
@@ -88,6 +90,9 @@ if "%debug%"=="1" echo [Debug][Wrapper] Git Branch: %GITBRANCH%
 set SET_DEFAULT_PROMPT=0
 if "%GITBRANCH%"=="" set SET_DEFAULT_PROMPT=1
 if "%debug%"=="1" echo [Debug][Wrapper] %SET_DEFAULT_PROMPT%
+
+::calling script to set the commandline prompt
+call %DYNAMICPROMPTSCRIPT%
 
 goto :EOF
 
