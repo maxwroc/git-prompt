@@ -70,6 +70,8 @@ if "%2" NEQ "" (
             echo Executing: git checkout %2 %3 master
             git checkout %2 %3 master
             goto :setprompt
+          ) else (
+            echo Creating branch [93m%3[0m based on [93m%GITBRANCH%[0m
           )
         )
       )
