@@ -5,11 +5,14 @@ set GITBRANCH=
 for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
 
 
+if "%debug%"=="1" echo [Debug][Wrapper] First: %1
+
 if "%1"=="/init" goto :Initialize
 if "%1"=="/cd" goto :ChangeDirectory
 
 if "%1"=="branch" goto :branch
 if "%1"=="checkout" goto :checkout
+
 
 :executecommand
 
@@ -34,7 +37,8 @@ goto :setprompt
     if "%2" EQU "-d" set res=T
     if "%2" EQU "-D" set res=T
     if "%res%"=="T" (
-      if "%3" EQU "" (
+      ::if branch name was not provided then print list and allow user to chose
+      if "%3"=="" (
         call :listbranches "Select branch to delete:" "Deleting branch" "git branch %2"
         goto :eof
       )
@@ -58,9 +62,9 @@ if "%2" NEQ "" (
           echo You're trying to create a new branch based on the current one.
           echo     Y - Create new branch based on %GITBRANCH%
           echo     N - Create new branch based on master
-          set /p answer=Was that your intention?
+          set /p answer=Was that your intention? 
 
-          if /I "%answer%" NEQ "y" (
+          if /i "%answer%" NEQ "y" (
             echo Executing: git checkout %2 %3 master
             git checkout %2 %3 master
             goto :setprompt
@@ -80,10 +84,12 @@ call :listbranches "Select branch to checkout:" "Switching to branch" "git check
 set GITBRANCH=
 for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
 
+if "%debug%"=="1" echo [Debug][Wrapper] Git Branch: %GITBRANCH%
 set SET_DEFAULT_PROMPT=0
 if "%GITBRANCH%"=="" set SET_DEFAULT_PROMPT=1
+if "%debug%"=="1" echo [Debug][Wrapper] %SET_DEFAULT_PROMPT%
 
-exit /B %ERRORLEVEL%
+goto :EOF
 
 :ChangeDirectory
   for /f "tokens=1,* delims= " %%a in ("%*") do set ALL_BUT_FIRST=%%b
@@ -118,7 +124,7 @@ goto :setprompt
       exit /b 0
     )
 
-    set /p answer=Enter branch number:
+    set /p answer=Enter branch number: 
     if !answer! gtr !count! goto :eof
     if !answer! lss 1 goto :eof
 

@@ -5,6 +5,8 @@ set template=%~dp0template.txt
 set temp_file=%TEMP%\prompt.txt
 set debug=0
 
+if not "%PROMPT_CUSTOM_TEMPLATE%"=="" set template=%PROMPT_CUSTOM_TEMPLATE%
+
 
 if "%debug%"=="1" echo [Debug] First param: %1
 if "%debug%"=="1" echo [Debug] Template location: %template%
@@ -21,6 +23,7 @@ if "%1"=="/?" goto :PrintUsage
 REM /init <command> <command_to_call>
 if "%1"=="/init" call :Initialize %ALL_BUT_FIRST%
 if "%1"=="/exec" call :ExecuteOrigCommand %ALL_BUT_FIRST%
+
 
 REM Set prompt and finish execution
 goto :SetPrompt
