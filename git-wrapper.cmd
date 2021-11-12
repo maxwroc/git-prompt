@@ -17,6 +17,7 @@ if "%1"=="checkout" goto :checkout
 
 ::if there was no supported param just execute git cmd
 :executecommand
+endlocal
 
 git %*
 
@@ -34,11 +35,12 @@ goto :setprompt
 
 :branch
   if "%2" NEQ "" (
+    setlocal EnableDelayedExpansion 
     set res=F
     ::check if second param is for deleting branch
     if "%2" EQU "-d" set res=T
     if "%2" EQU "-D" set res=T
-    if "%res%"=="T" (
+    if "!res!"=="T" (
       ::if branch name was not provided then print list and allow user to chose
       if "%3"=="" (
         call :listbranches "Select branch to delete:" "Deleting branch" "git branch %2"
@@ -52,6 +54,7 @@ goto :setprompt
 goto :setprompt
 
 :checkout
+setlocal EnableDelayedExpansion
 ::check if command has more than 1 arg
 if "%2" NEQ "" (
   ::check if user wants to create a branch
@@ -66,8 +69,8 @@ if "%2" NEQ "" (
           echo     N - Create new branch based on master
           set /p answer=Was that your intention? 
 
-          if /i "%answer%" NEQ "y" (
-            echo Executing: git checkout %2 %3 master
+          if /i "!answer!" NEQ "y" (
+            echo Executing: git checkout %2 %3 [93mmaster[0m
             git checkout %2 %3 master
             goto :setprompt
           ) else (
@@ -84,6 +87,8 @@ call :listbranches "Select branch to checkout:" "Switching to branch" "git check
 
 
 :setprompt
+
+endlocal
 
 set GITBRANCH=
 for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
@@ -105,7 +110,7 @@ goto :setprompt
 
 :listbranches
 
-  setlocal enableextensions enabledelayedexpansion
+  setlocal enableextensions EnableDelayedExpansion
 
   set info=%1
   set confirmation=%2
@@ -132,21 +137,24 @@ goto :setprompt
     )
 
     set /p answer=Enter branch number: 
-    if !answer! gtr !count! goto :eof
-    if !answer! lss 1 goto :eof
 
-    for /l %%n in (1,1,!count!) do (
-      if %%n==!answer! (
-        ::show message
-        echo %confirmation:"=% [93m!vector[%%n]![0m
-        echo.
+    :: iterate over given collection (possible more than one answer)
+    for %%i in (!answer!) do (
+      if %%i gtr !count! goto :eof
+      if %%i lss 1 goto :eof
 
-        ::execute command with branch param
-        call %command:"=% !vector[%%n]!
-        endlocal
-        goto :setprompt
+      for /l %%n in (1,1,!count!) do (
+        if %%n==%%i (
+          ::show message
+          echo %confirmation:"=% [93m!vector[%%n]![0m
+
+          ::execute command with branch param
+          call %command:"=% !vector[%%n]!
+        )
       )
     )
+    
+    goto :setprompt
   )
 
   endlocal
